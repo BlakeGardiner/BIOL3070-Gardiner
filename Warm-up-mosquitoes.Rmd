@@ -1,0 +1,79 @@
+---
+title: "Warm-up mini-Report Mosquitoes"
+author: "FILL IN YOUR NAME"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# ABSTRACT
+
+# BACKGROUND
+
+Fill in some text here that provides background info on the WNV system, the blood meal DNA extractions, PCR, sequencing, etc.
+
+```{r viremia, eval = FALSE}
+# Manually transcribe duration (mean, lo, hi) from the last table column
+duration <- data.frame(
+  Bird = c("Canada Goose","Mallard", 
+           "American Kestrel","Northern Bobwhite",
+           "Japanese Quail","Ring-necked Pheasant",
+           "American Coot","Killdeer",
+           "Ring-billed Gull","Mourning Dove",
+           "Rock Dove","Monk Parakeet",
+           "Budgerigar","Great Horned Owl",
+           "Northern Flicker","Blue Jay",
+           "Black-billed Magpie","American Crow",
+           "Fish Crow","American Robin",
+           "European Starling","Red-winged Blackbird",
+           "Common Grackle","House Finch","House Sparrow"),
+  mean = c(4.0,4.0,4.5,4.0,1.3,3.7,4.0,4.5,5.5,3.7,3.2,2.7,1.7,6.0,4.0,
+           4.0,5.0,3.8,5.0,4.5,3.2,3.0,3.3,6.0,4.5),
+  lo   = c(3,4,4,3,0,3,4,4,4,3,3,1,0,6,3,
+           3,5,3,4,4,3,3,3,5,2),
+  hi   = c(5,4,5,5,4,4,4,5,7,4,4,4,4,6,5,
+           5,5,5,7,5,4,3,4,7,6)
+)
+
+# match colors to your species plot
+cols_dur <- cols
+
+# horizontal barplot
+par(mar=c(5,12,2,2))  # wider left margin for names
+bp <- barplot(duration$mean, horiz=TRUE, names.arg=duration$Bird,
+              las=1, col=cols_dur, xlab="Days of detectable viremia", xlim=c(0,7))
+
+# add error bars
+arrows(duration$lo, bp, duration$hi, bp,
+       angle=90, code=3, length=0.05, col="black", xpd=TRUE)
+```
+NOTE: Examples of data you can plot for the background info at https://github.com/saarman/BIOL3070/blob/main/Wk1_plot_viremia.md
+
+
+# MAJOR QUESTION
+
+Fill in here, the question we want to answer...
+
+# MOTHODS
+
+Fill in here, including overview of proceedure and methods used for this project.
+
+## Fill in name of first analysis
+```{r analysis-1}
+# put code here
+```
+
+## Fill in name of second analysis/plot
+```{r plot}
+# put code for plotting here
+```
+
+# DISCUSSION
+
+## Interpretation of analysis 1
+
+## Interpretation of analysis/plot
+
+# CONCLUSIONS
