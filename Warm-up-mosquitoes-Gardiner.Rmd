@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 # ABSTRACT
 
-Fill in abstract at the end after we have finished the methods, results, discussion, conclusions and know what our data "says".
+West Nile virus (WNV) is maintained in nature through a transmission cycle between birds and mosquitoes, with certain bird species acting as key amplifying hosts. To explore which species may play this role in Salt Lake City, we identified blood meal hosts from field-collected mosquitoes and compared these data with WNV surveillance results. Mosquitoes were collected from multiple locations using standard traps, and DNA from their blood meals was extracted, amplified via PCR, and sequenced to identify host species using BLAST. We then analyzed whether feeding patterns, particularly on house finches (Haemorhous mexicanus), were associated with higher rates of WNV-positive mosquito pools. Our results showed that house finch blood meals were common at sites where WNV was detected, supporting the hypothesis that this species contributes to local virus amplification. These findings highlight the potential importance of house finches in sustaining WNV transmission in urban environments and demonstrate how molecular identification of mosquito blood meals can link host ecology to disease risk.
 
 # BACKGROUND
 
