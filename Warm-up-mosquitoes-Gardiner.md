@@ -1,7 +1,7 @@
 Warm-up mini-Report: Mosquito Blood Hosts in Salt Lake City, Utah
 ================
 Blake Gardiner
-2025-10-09
+2025-10-11
 
 - [ABSTRACT](#abstract)
 - [BACKGROUND](#background)
@@ -10,21 +10,31 @@ Blake Gardiner
   - [Hypothesis](#hypothesis)
   - [Prediction](#prediction)
 - [METHODS](#methods)
-  - [Fill in first analysis](#fill-in-first-analysis)
-- [put code for analysis here](#put-code-for-analysis-here)
-  - [Fill in second analysis/plot](#fill-in-second-analysisplot)
+  - [First Analysis](#first-analysis)
+- [Analysis Code](#analysis-code)
+  - [Second Analysis](#second-analysis)
 - [DISCUSSION](#discussion)
-  - [Interpretation - fill in
-    analysis](#interpretation---fill-in-analysis)
-  - [Interpretation - fill in
-    analysis/plot](#interpretation---fill-in-analysisplot)
 - [CONCLUSION](#conclusion)
 - [REFERENCES](#references)
 
 # ABSTRACT
 
-Fill in abstract at the end after we have finished the methods, results,
-discussion, conclusions and know what our data “says”.
+West Nile virus (WNV) is maintained in nature through a transmission
+cycle between birds and mosquitoes, with certain bird species acting as
+key amplifying hosts. To explore which species may play this role in
+Salt Lake City, we identified blood meal hosts from field-collected
+mosquitoes and compared these data with WNV surveillance results.
+Mosquitoes were collected from multiple locations using standard traps,
+and DNA from their blood meals was extracted, amplified via PCR, and
+sequenced to identify host species using BLAST. We then analyzed whether
+feeding patterns, particularly on house finches (Haemorhous mexicanus),
+were associated with higher rates of WNV-positive mosquito pools. Our
+results showed that house finch blood meals were common at sites where
+WNV was detected, supporting the hypothesis that this species
+contributes to local virus amplification. These findings highlight the
+potential importance of house finches in sustaining WNV transmission in
+urban environments and demonstrate how molecular identification of
+mosquito blood meals can link host ecology to disease risk.
 
 # BACKGROUND
 
@@ -49,9 +59,6 @@ can maintain detectable levels of viremia for several days (Kumar et
 al., 2003), they may act as important amplifying hosts. Therefore, we
 predict that locations where mosquitoes more frequently fed on house
 finches will also show higher rates of WNV-positive mosquito pools.
-
-NOTE: Examples of data you can plot for the background info at
-<https://github.com/saarman/BIOL3070/>
 
 ``` r
 # Manually transcribe duration (mean, lo, hi) from the last table column
@@ -132,9 +139,25 @@ finches, were associated with higher rates of WNV-positive mosquito
 pools. Statistical tests and plots were created in R to explore and
 visualize these relationships.
 
-## Fill in first analysis
+## First Analysis
 
-# put code for analysis here
+In the first analysis, the number of mosquito blood meals was compared
+from different bird species between sites where WNV was detected (+) and
+sites where it wasn’t (-). The barplots were used to show how often
+mosquitoes fed on each bird species at both types of sites.
+
+From these plots, it looked like mosquitoes collected at WNV-positive
+locations fed on house finches more often than those collected at
+WNV-negative sites. This pattern suggested that house finches might be
+an important host in helping the virus spread. Seeing that difference
+visually gave the first clue that house finches could be linked to
+higher WNV activity. The fact that house finches are also fed on more
+than any other species at WNV-negative sites suggests that mosquitoes
+may be specifically targeting them as preferred hosts. This could be
+concerning because it means that the mosquitoes’ preferred source of
+blood is also one of the best species for maintaining and spreading WNV.
+
+# Analysis Code
 
 Horizontal plots:
 
@@ -234,13 +257,32 @@ par(op)
 host_species_colors <- species_colors
 ```
 
-## Fill in second analysis/plot
+## Second Analysis
 
-Fill in here… Explain that you tested whether the presence or number of
-house finch blood meals predicts whether a site had WNV-positive pools
-(binary) or a higher WNV positivity rate (numeric). Mention that this
-statistical test lets you formally evaluate the relationship suggested
-by the barplots.
+In the second analysis, a test was ran to see whether or not the number
+of house finch blood meals could predict whether a site had West Nile
+virus (WNV).
+
+The first statistical test used a logistic regression, which looked at
+whether sites with more house finch feedings were more likely to have
+WNV-positive mosquito pools. The slope for house finch blood meals was
+0.347, and the p-value was 0.0287, meaning the relationship had a
+positive slope and was statistically significant. This shows that as the
+number of house finch blood meals increases, the odds of finding WNV at
+that site also go up.
+
+The second test looked at whether the rate of WNV positivity (the
+proportion of positive mosquito pools) increased with the number of
+house finch blood meals. In this case, the slope was 0.0275, and the
+p-value was 4.54 × 10⁻⁵, which is even more significant than the first
+test. This means that sites where mosquitoes fed on house finches more
+often also had a higher WNV positivity rate.
+
+Overall, both tests showed a strong, positive relationship between
+mosquito feeding on house finches and WNV activity across sites,
+supporting the hypothesis that house finches play a major role in
+amplifying the virus. The low p-values indicate that these patterns can
+not be credited to chance nor coincidence.
 
 ``` r
 # put code for plotting here
@@ -300,11 +342,39 @@ summary(glm2)
 
 # DISCUSSION
 
-## Interpretation - fill in analysis
+The results of both analyses support the hypothesis that mosquitoes
+feeding on house finches are associated with higher West Nile virus
+(WNV) activity in Salt Lake City. The logistic regression showed a
+significant positive relationship between house finch blood meals and
+WNV presence (slope = 0.347, p = 0.0287), indicating that sites with
+more feedings on house finches were more likely to have WNV-positive
+mosquito pools. Similarly, the analysis of WNV positivity rate
+demonstrated a strong positive association (slope = 0.0275, p = 4.54 ×
+10⁻⁵), meaning that higher numbers of house finch feedings corresponded
+to higher rates of WNV detection.
 
-## Interpretation - fill in analysis/plot
+These findings align with the background information and the viremia
+plot from class, which showed that house finches can maintain detectable
+viral loads for several days, making them efficient amplification hosts.
+The fact that mosquitoes also feed heavily on house finches at
+WNV-negative sites suggests that house finches may be a preferred host,
+which could facilitate virus cycling once introduced.
+
+One limitation of this study is that it focuses on blood meal counts and
+WNV detection at the site level. Other factors, such as seasonal
+changes, mosquito abundance, and the presence of other competent hosts,
+could influence transmission but were not accounted for in this
+analysis.
 
 # CONCLUSION
+
+In summary, the analyses indicate that mosquito feeding on house finches
+is positively associated with both the presence and rate of WNV at local
+sites. These results support the hypothesis that house finches act as
+important amplifying hosts, and their feeding patterns may help predict
+areas of higher WNV risk. This study demonstrates the value of linking
+mosquito blood meal data with virus surveillance to better understand
+the ecology of mosquito-borne diseases.
 
 # REFERENCES
 
@@ -313,5 +383,7 @@ summary(glm2)
     birds with the New York 1999 strain of West Nile virus. Emerg Infect
     Dis. 2003 Mar;9(3):311-22. <https://doi.org/10.3201/eid0903.020628>
 
-2.  ChatGPT. OpenAI, version Jan 2025. Used as a reference for functions
-    such as plot() and to correct syntax errors. Accessed 2025-10-09.
+2.  ChatGPT. OpenAI, version Jan 2025. Used as a reference for the code,
+    grammar (like correcting sentence structure, commas, run-on
+    sentences, etc.) correction, brainstorming, and help contexualizing
+    data. Accessed 2025-10-11.
