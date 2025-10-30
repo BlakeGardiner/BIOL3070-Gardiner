@@ -1,0 +1,95 @@
+---
+title: "Final Project"
+author: "Blake Gardiner"
+date: "`r Sys.Date()`"
+output:
+  github_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# ABSTRACT
+
+
+
+# BACKGROUND
+
+
+
+
+#Insert graph from paper for background info
+
+# STUDY QUESTION and HYPOTHESIS
+
+## Questions  
+What effect does genetics and phenotypes have on pain management among European cancer patients who have been treated with opioids?
+
+## Hypothesis 
+
+  
+## Prediction
+I predict that there will be certain phenotypes and genetics that correspond to lesser pain responses depending on the unique genetic makeup of each demographic.
+
+# METHODS
+
+
+## First Analysis
+
+``` 
+# Analysis Code
+
+
+## Second Analysis
+
+In the second analysis, a test was ran to see whether or not the number of house finch blood meals could predict whether a site had West Nile virus (WNV).
+
+The first statistical test used a logistic regression, which looked at whether sites with more house finch feedings were more likely to have WNV-positive mosquito pools. The slope for house finch blood meals was 0.347, and the p-value was 0.0287, meaning the relationship had a positive slope and was statistically significant. This shows that as the number of house finch blood meals increases, the odds of finding WNV at that site also go up.
+
+The second test looked at whether the rate of WNV positivity (the proportion of positive mosquito pools) increased with the number of house finch blood meals. In this case, the slope was 0.0275, and the p-value was 4.54 × 10⁻⁵, which is even more significant than the first test. This means that sites where mosquitoes fed on house finches more often also had a higher WNV positivity rate.
+
+Overall, both tests showed a strong, positive relationship between mosquito feeding on house finches and WNV activity across sites, supporting the hypothesis that house finches play a major role in amplifying the virus. The low p-values indicate that these patterns can not be credited to chance nor coincidence. 
+```{r second-analysis-or-plot, include=TRUE, eval=TRUE, warning=FALSE, fig.align='left', fig.width=4.75, fig.height=7}
+# put code for plotting here
+# second-analysis-or-plot, glm with house finch alone against binary +/_
+glm1 <- glm(loc_positives ~ host_House_finch,
+            data = counts_matrix,
+            family = binomial)
+summary(glm1)
+
+#glm with house-finch alone against positivity rate
+glm2 <- glm(loc_rate ~ host_House_finch,
+            data = counts_matrix)
+summary(glm2)
+```
+
+# DISCUSSION
+
+The results of both analyses support the hypothesis that mosquitoes feeding on house finches are associated with higher West Nile virus (WNV) activity in Salt Lake City. The logistic regression showed a significant positive relationship between house finch blood meals and WNV presence (slope = 0.347, p = 0.0287), indicating that sites with more feedings on house finches were more likely to have WNV-positive mosquito pools. Similarly, the analysis of WNV positivity rate demonstrated a strong positive association (slope = 0.0275, p = 4.54 × 10⁻⁵), meaning that higher numbers of house finch feedings corresponded to higher rates of WNV detection.
+
+These findings align with the background information and the viremia plot from class, which showed that house finches can maintain detectable viral loads for several days, making them efficient amplification hosts. The fact that mosquitoes also feed heavily on house finches at WNV-negative sites suggests that house finches may be a preferred host, which could facilitate virus cycling once introduced.
+
+One limitation of this study is that it focuses on blood meal counts and WNV detection at the site level. Other factors, such as seasonal changes, mosquito abundance, and the presence of other competent hosts, could influence transmission but were not accounted for in this analysis.
+
+# CONCLUSION
+
+In summary, the analyses indicate that mosquito feeding on house finches is positively associated with both the presence and rate of WNV at local sites. These results support the hypothesis that house finches act as important amplifying hosts, and their feeding patterns may help predict areas of higher WNV risk. This study demonstrates the value of linking mosquito blood meal data with virus surveillance to better understand the ecology of mosquito-borne diseases.
+
+# REFERENCES     
+
+1. Komar N, Langevin S, Hinten S, Nemeth N, Edwards E, Hettler D, Davis B, Bowen R, Bunning M. Experimental infection of North American birds with the New York 1999 strain of West Nile virus. Emerg Infect Dis. 2003 Mar;9(3):311-22. https://doi.org/10.3201/eid0903.020628
+
+2. ChatGPT. OpenAI, version Jan 2025. Used as a reference for the code, grammar (like correcting sentence structure, commas, run-on sentences, etc.) correction, brainstorming, and help contexualizing data. Accessed `r Sys.Date()`.
+
+# Install the packages if not already done
+# install.packages("ggplot2")
+# install.packages("geomtextpath")
+
+# Load the package
+library(ggplot2)
+
+install.packages("geomtextpath")
+ggplot2:
+
+
