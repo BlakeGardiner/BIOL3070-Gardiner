@@ -207,7 +207,7 @@ available. All code is in the .Rmd using tidyverse/ggplot2.
 # REFERENCES
 
 1.  ChatGPT. OpenAI, version Jan 2025. Used as a reference for functions
-    such as plot() and to correct syntax errors. Accessed 2025-10-30.
+    such as plot() and to correct syntax errors. Accessed 2025-11-04.
 2.  Galvan, A., Skorpen, F., Klepstad, P., Knudsen, A. K., Fladvad, T.,
     Falvella, F. S., Pigni, A., Brunelli, C., Caraceni, A., Kaasa, S., &
     Dragani, T. A. (2011). Multiple loci modulate opioid therapy

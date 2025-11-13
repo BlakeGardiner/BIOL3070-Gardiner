@@ -1,14 +1,14 @@
 ---
 title: "Opioid Therapy Response in European Cancer Patients"
-author: "Blake Gardiner Homework 10"
-date: "2025-10-29"
+author: "Blake Gardiner"
+date: "2025-10-28"
 output: github_document
 ---
 
   github_document:
   toc: true
 ---
- 
+  
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -17,11 +17,10 @@ Opioid pain relief isn’t the same for every cancer patient, and genetics likel
 
 # BACKGROUND
 Pain control on opioids varies widely, even at similar doses. Clinical factors explain some of it, but prior EPOS work points to a genetic component, including a variant near RHBDF2 (rs12948783). I don’t have patient-level outcomes or doses; I do have the study’s Table 2 (term enrichment) and Table 3 (top SNPs). So I’m first visualizing what’s available to ground the story: do bigger gene sets show stronger enrichment, and where does rs12948783 fall among the top SNP signals? This keeps the genetics focus clear while I stage the planned patient-level model for later.
-```{r fig1_multireg, eval=FALSE}
+```{r fig1_multireg, eval=TRUE}
 # your plotting / model code here
-```
 
-```{r fig_reg_table2, eval=TRUE, message=FALSE, warning=FALSE}
+## ---- fig_reg_table2, eval=TRUE, message=FALSE, warning=FALSE---------------
 # If needed once in Console: install.packages(c("readxl","dplyr","ggplot2","readr","stringr"))
 
 library(readxl)
@@ -30,8 +29,7 @@ library(ggplot2)
 library(readr)
 library(stringr)
 
-excel_path <- "/cloud/project/BIOL 3070 Final Project DATA POOL.xlsx"
-stopifnot(file.exists(excel_path))
+excel_path <- "BIOL 3070 Final Project DATA POOL.xlsx"
 
 # Read exactly "Table 2"
 raw_t2 <- read_excel(excel_path, sheet = "Table 2", .name_repair = "minimal")
@@ -41,15 +39,23 @@ cat("\n-- Raw headers --\n"); print(names(raw_t2))
 cat("\n-- Sample values in `Gene count` and `Pa` --\n")
 print(head(raw_t2[c("Gene count","Pa")], 10))
 
-# Robust parsing
+# Robust parsing:
+# - Handle commas as decimal separators
+# - Strip non-numeric characters (e.g., "<", "p=", spaces)
+# - Convert to numbers safely
 t2 <- raw_t2 %>%
   mutate(
     gene_count_txt = as.character(`Gene count`),
     p_txt          = as.character(Pa),
+
+    # Replace comma decimal with dot, remove spaces
     gene_count_txt = str_replace_all(gene_count_txt, ",", "."),
     p_txt          = str_replace_all(p_txt, ",", "."),
+
+    # Extract numbers (keeps scientific notation like 1e-5)
     gene_count = parse_number(gene_count_txt, locale = locale(decimal_mark = ".")),
     p_value    = parse_number(p_txt,          locale = locale(decimal_mark = ".")),
+
     neglog10p  = -log10(p_value)
   )
 
@@ -63,10 +69,12 @@ if (nrow(t2_ok) == 0) {
        "The prints above show the first few raw values so we can adjust parsing if needed.")
 }
 
+# Linear regression: enrichment strength ~ gene_count
 m <- lm(neglog10p ~ gene_count, data = t2_ok)
 cat("\n=== Regression summary: -log10(p) ~ gene_count ===\n")
 print(summary(m))
 
+# Plot: scatter + regression line + CI
 ggplot(t2_ok, aes(gene_count, neglog10p)) +
   geom_point(alpha = 0.7) +
   geom_smooth(method = "lm", se = TRUE) +
@@ -83,7 +91,7 @@ ggplot(t2_ok, aes(gene_count, neglog10p)) +
 # Question  
 With the EPOS summary tables, do larger gene sets show stronger enrichment (Table 2), and where does rs12948783 rank among the top SNP associations across chromosomes (Table 3)?
 
-# Hypothesis
+# Hypothesis 
 Terms with more genes will have stronger enrichment (higher −log10 p), and rs12948783 will appear among notable SNP signals in the summary results.
 
 # Prediction
@@ -93,54 +101,62 @@ I expect a positive relationship in the summary enrichment data: terms with more
 I imported the EPOS Excel workbook and worked directly from the summary tables available. From Table 2, I ran a simple linear regression of −log10(p) on gene count and plotted a scatter with an OLS line and 95% CI. From Table 3, I plotted −log10(p) versus position (Mb) within each chromosome and highlighted rs12948783; I cleaned headers, dropped the note row, and used sparse x-axis ticks so labels are readable. Because I don’t have patient-level rows (pain relief, dose, genotype, country, gender), I also included a draft multiple-regression code block—pain_relief ~ dose * genotype + country + gender—marked eval=FALSE as the planned analysis if individual-level data become available. All code is in the .Rmd using tidyverse/ggplot2.
 
 ## Fill in 1st analysis
-```{r fig_table3_clean_ticks, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=6}
+```{r}
+## ---- fig_table3_clean_ticks, eval=TRUE, message=FALSE, warning=FALSE-------
 library(readxl)
+library(dplyr)
 library(ggplot2)
 library(readr)
+library(stringr)
 library(scales)
 
-excel_path <- "/cloud/project/BIOL 3070 Final Project DATA POOL.xlsx"
+excel_path <- "BIOL 3070 Final Project DATA POOL.xlsx"
 stopifnot(file.exists(excel_path))
 
-t3_raw <- read_excel(excel_path, sheet = "Table 3.0", .name_repair = "minimal")
+# Read your SNP sheet
+t3_raw <- read_excel(excel_path, sheet = "Table 3.0", .name_repair = "unique")
 
-t3 <- t3_raw[, 1:7]
-colnames(t3) <- c(
-  "SNP", "Chromosome", "Position_Mb", "Gene",
-  "Minor_allele", "Common_allele", "Freq_minor"
-)
-t3 <- t3[!is.na(t3$SNP), ]
+t3 <- t3_raw %>%
+  filter(!(is.na(.data[["Chromosome"]]) & is.na(.data[["Position_Mb"]]))) %>%
+  transmute(
+    chr_raw = as.character(`Chromosome`),
+    pos_txt = as.character(`Position_Mb`),
+    p1_txt  = as.character(`First series`),
+    p2_txt  = as.character(`Second series`),
+    snp     = as.character(`SNP`)
+  ) %>%
+  mutate(
+    chr = case_when(
+      str_to_lower(chr_raw) == "x" ~ 23,
+      str_to_lower(chr_raw) == "y" ~ 24,
+      TRUE ~ parse_number(chr_raw)
+    ),
+    pos_mb = parse_number(str_replace_all(pos_txt, ",", ".")),
+    p1 = parse_number(str_replace_all(p1_txt, ",", ".")),
+    p2 = parse_number(str_replace_all(p2_txt, ",", ".")),
+    p_val = pmin(p1, p2, na.rm = TRUE),   # combine by smallest p-value
+    neglog10p = -log10(p_val),
+    highlight = if_else(str_detect(str_to_lower(snp), "rs12948783"), "rs12948783", "Other")
+  ) %>%
+  filter(is.finite(chr), is.finite(pos_mb), is.finite(neglog10p), p_val > 0)
 
-t3$Chromosome  <- readr::parse_number(as.character(t3$Chromosome))
-t3$Position_Mb <- readr::parse_number(as.character(t3$Position_Mb))
-t3$Freq_minor  <- readr::parse_number(as.character(t3$Freq_minor))
-
-t3_plot <- subset(t3, !is.na(Position_Mb) & !is.na(Freq_minor))
-t3_plot$highlight <- ifelse(tolower(t3_plot$SNP) == "rs12948783", "rs12948783", "Other")
-
-ggplot(t3_plot, aes(x = Position_Mb, y = Freq_minor)) +
+# Plot by chromosome
+ggplot(t3, aes(pos_mb, neglog10p)) +
   geom_point(aes(color = highlight), alpha = 0.85, size = 1.9) +
-  facet_wrap(~ Chromosome, scales = "free_x", ncol = 6) +
+  facet_wrap(~ chr, scales = "free_x", ncol = 6) +
   scale_color_manual(values = c("Other" = "grey40", "rs12948783" = "red")) +
-  scale_x_continuous(
-    breaks = scales::pretty_breaks(n = 3),
-    labels = scales::label_number(accuracy = 1)
-  ) +
-  scale_y_continuous(
-    limits = c(0, 1),
-    breaks = seq(0, 1, 0.2)
-  ) +
+  scale_x_continuous(breaks = pretty_breaks(n = 3)) +
   labs(
-    title = "Minor-allele frequency by chromosome (Table 3.0)",
-    x = "Position (Mb)",
-    y = "Frequency of the minor allele",
+    title = expression(SNP~associations~by~chromosome~(Table~3)),
+    x = "Position (Mb) within chromosome",
+    y = expression(-log[10](p)),
     color = NULL
   ) +
   theme_minimal() +
   theme(
-    legend.position    = "top",
+    legend.position = "top",
     panel.grid.minor.x = element_blank(),
-    axis.text.x        = element_text(size = 8)
+    axis.text.x = element_text(size = 8)
   )
 ```
 
@@ -153,7 +169,35 @@ ggplot(t3_plot, aes(x = Position_Mb, y = Freq_minor)) +
 
 
 
-# REFERENCES    
+# REFERENCES     
 1. ChatGPT. OpenAI, version Jan 2025. Used as a reference for functions such as plot() and to correct syntax errors. Accessed `r Sys.Date()`.
-2. Galvan, A., Skorpen, F., Klepstad, P., Knudsen, A. K., Fladvad, T., Falvella, F. S., Pigni, A., Brunelli, C., Caraceni, A., Kaasa, S., & Dragani, T. A. (2011). Multiple loci modulate opioid therapy response for cancer pain. Clinical Cancer Research, 17(13), 4581–4587. https://doi.org/10.1158/1078-0432.CCR-10-3028.
+2. Galvan, A., Skorpen, F., Klepstad, P., Knudsen, A. K., Fladvad, T., Falvella, F. S., Pigni, A., Brunelli, C., Caraceni, A., Kaasa, S., & Dragani, T. A. (2011). Multiple loci modulate opioid therapy response for cancer pain. Clinical Cancer Research, 17(13), 4581–4587. https://doi.org/10.1158/1078-0432.CCR-10-3028. 
 
+
+```{r}
+
+library(ggplot2)
+data <- read.csv("Opioid dataset.csv")
+str(data)
+
+model <- lm(percent_pain_relief ~ daily_dose_mg_ME + age + sex +
+               rs12211463_minor_allele_count +
+               rs13421094_minor_allele_count +
+               rs10413396_minor_allele_count,
+             data = data)
+
+summary(model)
+
+
+ggplot(data, aes(x = daily_dose_mg_ME, y = percent_pain_relief, color = sex)) +
+  geom_point(alpha = 0.7) +
+  geom_smooth(method = "lm", se = TRUE, color = "black") +
+  labs(
+    title = "Relationship Between Opioid Dose and Pain Relief",
+    subtitle = "Simulated data based on Galvan et al. (2011)",
+    x = "Daily Dose (Morphine Equivalent, mg)",
+    y = "Percent Pain Relief"
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold"))
+```

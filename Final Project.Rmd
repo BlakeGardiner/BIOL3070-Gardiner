@@ -37,7 +37,125 @@ I predict that there will be certain phenotypes and genetics that correspond to 
 
 ## First Analysis
 
-``` 
+```{r}
+
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+library(readr)
+
+# 1. Read in the CSV file
+data <- read_csv("epos_style_rs12948783_simulated_large.csv")
+
+# 2. Inspect the data
+glimpse(data)
+summary(data)
+
+# 3. Example 1: Boxplot of normalized pain relief by genotype
+ggplot(data, aes(x = genotype, y = norm_pain_relief, fill = genotype)) +
+  geom_boxplot(alpha = 0.7) +
+  labs(title = "Pain Relief Efficacy by Genotype",
+       x = "Genotype",
+       y = "Normalized Pain Relief") +
+  theme_minimal()
+# 4. Example 2: Pain relief by genotype and sex
+ggplot(data, aes(x = genotype, y = norm_pain_relief, fill = sex)) +
+  geom_boxplot(alpha = 0.7, position = position_dodge(0.8)) +
+  labs(title = "Pain Relief Efficacy by Genotype and Sex",
+       x = "Genotype",
+       y = "Normalized Pain Relief") +
+  theme_minimal()
+
+# 5. Example 3: Mean pain relief by genotype and carrier status
+data %>%
+  group_by(genotype, carrier) %>%
+  summarize(mean_relief = mean(norm_pain_relief, na.rm = TRUE)) %>%
+  ggplot(aes(x = genotype, y = mean_relief, fill = carrier)) +
+  geom_bar(stat = "identity", position = position_dodge()) +
+  labs(title = "Mean Pain Relief by Genotype and Carrier Status",
+       x = "Genotype",
+       y = "Mean Normalized Pain Relief") +
+  theme_minimal()
+
+# 6. Example 4: Violin plot comparing pain relief by genotype across countries
+ggplot(data, aes(x = genotype, y = norm_pain_relief, fill = country)) +
+  geom_violin(alpha = 0.6, trim = FALSE) +
+  labs(title = "Pain Relief Efficacy by Genotype Across Countries",
+       x = "Genotype",
+       y = "Normalized Pain Relief") +
+  theme_minimal()
+
+
+
+
+# Load required libraries
+library(ggplot2)
+library(dplyr)
+library(readr)
+library(ggpubr)
+
+# 1. Read in the data
+data <- read_csv("epos_style_rs12948783_simulated_large.csv")
+
+# 2. Inspect structure
+glimpse(data)
+summary(data)
+names(data)
+
+# 3. One-way ANOVA: Does genotype affect normalized pain relief?
+anova_genotype <- aov(norm_pain_relief ~ genotype, data = data)
+summary(anova_genotype)
+
+# 4. Pairwise comparison (Tukey HSD)
+tukey_results <- TukeyHSD(anova_genotype)
+tukey_results
+
+# 5. Boxplot with ANOVA p-value
+ggboxplot(data, x = "genotype", y = "norm_pain_relief",
+          color = "genotype", palette = "jco",
+          add = "jitter", 
+          title = "Pain Relief by Genotype") +
+  stat_compare_means(method = "anova", label.y = max(data$norm_pain_relief, na.rm = TRUE) * 1.05) +
+  theme_minimal()
+
+# 6. Two-way ANOVA: Genotype × Sex
+anova_genotype_sex <- aov(norm_pain_relief ~ genotype * sex, data = data)
+summary(anova_genotype_sex)
+
+# Boxplot with comparisons between sexes per genotype
+ggboxplot(data, x = "genotype", y = "norm_pain_relief",
+          fill = "sex", palette = "Set2",
+          title = "Pain Relief by Genotype and Sex") +
+  stat_compare_means(aes(group = sex), label = "p.signif", method = "t.test",
+                     label.y = max(data$norm_pain_relief, na.rm = TRUE) * 1.05) +
+  theme_minimal()
+
+# 7. Carrier effect by genotype (two-way ANOVA)
+anova_carrier <- aov(norm_pain_relief ~ genotype * carrier, data = data)
+summary(anova_carrier)
+
+# Bar plot with mean ± SE by genotype and carrier
+data %>%
+  group_by(genotype, carrier) %>%
+  summarize(mean_relief = mean(norm_pain_relief, na.rm = TRUE),
+            se_relief = sd(norm_pain_relief, na.rm = TRUE)/sqrt(n())) %>%
+  ggplot(aes(x = genotype, y = mean_relief, fill = carrier)) +
+  geom_bar(stat = "identity", position = position_dodge(0.8)) +
+  geom_errorbar(aes(ymin = mean_relief - se_relief, ymax = mean_relief + se_relief),
+                position = position_dodge(0.8), width = 0.2) +
+  labs(title = "Mean Pain Relief by Genotype and Carrier Status",
+       x = "Genotype",
+       y = "Mean ± SE Normalized Pain Relief") +
+  theme_minimal()
+
+# 8. Violin plot with country comparisons (Kruskal-Wallis)
+ggviolin(data, x = "genotype", y = "norm_pain_relief",
+         fill = "country", palette = "Paired",
+         title = "Pain Relief Efficacy by Genotype Across Countries") +
+  stat_compare_means(method = "kruskal.test",
+                     label.y = max(data$norm_pain_relief, na.rm = TRUE) * 1.05) +
+  theme_minimal()
+```
 # Analysis Code
 
 
