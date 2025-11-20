@@ -1,7 +1,7 @@
 Warm-up mini-Report: Mosquito Blood Hosts in Salt Lake City, Utah
 ================
 Blake Gardiner
-2025-10-11
+2025-11-18
 
 - [ABSTRACT](#abstract)
 - [BACKGROUND](#background)
@@ -16,6 +16,10 @@ Blake Gardiner
 - [DISCUSSION](#discussion)
 - [CONCLUSION](#conclusion)
 - [REFERENCES](#references)
+- [Read data](#read-data)
+- [Make genotype a 3-level factor](#make-genotype-a-3-level-factor)
+- [Compute means for each genotype](#compute-means-for-each-genotype)
+- [Plot](#plot)
 
 # ABSTRACT
 
@@ -386,4 +390,40 @@ the ecology of mosquito-borne diseases.
 2.  ChatGPT. OpenAI, version Jan 2025. Used as a reference for the code,
     grammar (like correcting sentence structure, commas, run-on
     sentences, etc.) correction, brainstorming, and help contexualizing
-    data. Accessed 2025-10-11.
+    data. Accessed 2025-11-18.
+
+\`\`\`{r-test}
+
+library(ggplot2) library(dplyr)
+
+# Read data
+
+dat \<- read.csv(“epos_style_rs12948783_simulated_large.csv”)
+
+# Make genotype a 3-level factor
+
+dat$genotype <- factor(dat$genotype, levels = c(“AA”, “GA”, “GG”))
+
+# Compute means for each genotype
+
+means \<- dat %\>% group_by(genotype) %\>% summarise(m =
+mean(norm_pain_relief), .groups = “drop”)
+
+# Plot
+
+p3 \<- ggplot(dat, aes(genotype, norm_pain_relief)) + geom_boxplot(width
+= 0.55, outlier.shape = NA) + geom_jitter(width = 0.15, alpha = 0.15,
+size = 0.8) + stat_summary(fun = mean, geom = “point”, size = 3) +
+stat_summary(fun.data = mean_se, geom = “errorbar”, width = 0.15) +
+
+\# OPTIONAL: connect means with line (across the 3 genotypes)
+geom_segment(data = data.frame( x = c(1, 2), xend = c(2, 3), y =
+means$m[means$genotype == “AA”\], yend = means$m[means$genotype ==
+“GA”\], y2 = means$m[means$genotype == “GA”\], yend2=
+means$m[means$genotype == “GG”\] ), aes(x = x, xend = xend, y = y, yend
+= yend), inherit.aes = FALSE) +
+
+coord_cartesian(ylim = c(80, 110)) + labs(x = “rs12948783 Genotype”, y =
+“Normalized pain relief (%)”) + theme_classic(base_size = 13)
+
+p3 \`\`\`
